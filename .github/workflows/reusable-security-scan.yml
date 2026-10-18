@@ -1,0 +1,74 @@
+name: Security Scan (reusable)
+
+# Paket pemindaian keamanan standar: secret scanning, audit dependensi,
+# dan misconfiguration scan IaC. Secret TIDAK PERNAH disimpan di repository —
+# workflow ini membantu menegakkannya.
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        type: string
+        default: "."
+      run-gitleaks:
+        type: boolean
+        default: true
+      run-dependency-audit:
+        type: boolean
+        default: true
+      run-iac-scan:
+        type: boolean
+        default: false
+      iac-directory:
+        type: string
+        default: terraform
+    secrets:
+      GITLEAKS_LICENSE:
+        description: Lisensi gitleaks untuk organisasi (repo privat)
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: Secret scanning
+    if: inputs.run-gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  dependencies:
+    name: Dependency audit
+    if: inputs.run-dependency-audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - name: Audit (blokir kritikal)
+        run: bun audit --audit-level=critical
+      - name: Audit (laporan penuh, tidak memblokir)
+        run: bun audit || true
+
+  iac:
+    name: IaC misconfiguration scan
+    if: inputs.run-iac-scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Trivy config scan
+        run: |
+          docker run --rm -v "$PWD":/src aquasec/trivy:latest \
+            config --severity HIGH,CRITICAL --exit-code 1 "/src/${{ inputs.iac-directory }}"

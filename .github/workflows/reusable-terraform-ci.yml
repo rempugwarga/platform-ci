@@ -1,0 +1,46 @@
+name: Terraform CI (reusable)
+
+# Pemeriksaan dasar Terraform untuk repo IaC (mis. identity-platform).
+# Untuk integration test realm, repo pemanggil menambahkan job sendiri
+# (lihat scripts/integration-test.sh di identity-platform).
+
+on:
+  workflow_call:
+    inputs:
+      terraform-directory:
+        description: Direktori root terraform di repo pemanggil
+        type: string
+        default: terraform
+      validate-script:
+        description: Script opsional di repo pemanggil untuk init+validate semua modul/env
+        type: string
+        default: ""
+      run-tflint:
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Terraform checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: hashicorp/setup-terraform@v3
+      - name: Format check
+        run: terraform fmt -check -recursive ${{ inputs.terraform-directory }}
+      - name: Init + validate via script
+        if: inputs.validate-script != ''
+        run: bash ${{ inputs.validate-script }}
+      - uses: terraform-linters/setup-tflint@v4
+        if: inputs.run-tflint
+        with:
+          tflint_version: latest
+      - name: tflint
+        if: inputs.run-tflint
+        working-directory: ${{ inputs.terraform-directory }}
+        run: |
+          tflint --init
+          tflint --recursive

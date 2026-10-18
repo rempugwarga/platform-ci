@@ -1,0 +1,20 @@
+# Dependencies
+node_modules
+
+# Terraform
+.terraform/
+**/.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.tfvars
+
+# Tooling
+coverage
+.DS_Store
+*.log

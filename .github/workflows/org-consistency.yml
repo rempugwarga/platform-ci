@@ -1,0 +1,70 @@
+name: Org Consistency
+
+# Validasi mingguan bahwa kontrak lintas repo tidak melenceng dari sumber
+# kebenaran repos.yaml: CODEOWNERS, services.yaml, dan owner client OIDC.
+#
+# Membutuhkan secret ORG_READ_TOKEN: token baca (read-only) tingkat organisasi
+# (fine-grained PAT / GitHub App) yang dapat membaca semua repo privat.
+# Lihat docs/SECRET-MANAGEMENT.md — token disimpan sebagai secret, tidak di repo.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: org-consistency
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  consistency:
+    name: Cross-repo contract consistency
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pastikan ORG_READ_TOKEN tersedia
+        env:
+          ORG_READ_TOKEN: ${{ secrets.ORG_READ_TOKEN }}
+        run: |
+          if [ -z "$ORG_READ_TOKEN" ]; then
+            echo "::error::Secret ORG_READ_TOKEN belum diatur. Buat token baca tingkat organisasi dan simpan sebagai secret (lihat docs/SECRET-MANAGEMENT.md)."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+        with:
+          path: .org/platform-ci
+      - uses: actions/checkout@v5
+        with:
+          repository: rempugwarga/design-system
+          token: ${{ secrets.ORG_READ_TOKEN }}
+          path: .org/design-system
+      - uses: actions/checkout@v5
+        with:
+          repository: rempugwarga/identity-platform
+          token: ${{ secrets.ORG_READ_TOKEN }}
+          path: .org/identity-platform
+      - uses: actions/checkout@v5
+        with:
+          repository: rempugwarga/platform-docs
+          token: ${{ secrets.ORG_READ_TOKEN }}
+          path: .org/platform-docs
+      - uses: actions/checkout@v5
+        with:
+          repository: rempugwarga/app-template
+          token: ${{ secrets.ORG_READ_TOKEN }}
+          path: .org/app-template
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - name: Install (platform-ci)
+        working-directory: .org/platform-ci
+        run: bun install --frozen-lockfile
+
+      - name: Validasi konsistensi kontrak lintas repo
+        working-directory: .org/platform-ci
+        run: bun scripts/check-consistency.ts --workspace .org --strict

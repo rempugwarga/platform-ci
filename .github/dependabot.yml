@@ -1,0 +1,34 @@
+# Perubahan dependensi npm dan GitHub Actions diusulkan otomatis.
+# Reviewer: Platform Engineering (lihat .github/CODEOWNERS).
+# Catatan: perubahan pada reusable workflows adalah perubahan kontrak —
+# dependabot membuat PR, review manusia tetap wajib (required checks).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    groups:
+      rstack:
+        patterns:
+          - '@rstest/*'
+          - '@rsbuild/*'
+      validation:
+        patterns:
+          - 'ajv'
+          - 'yaml'
+          - 'typescript'
+          - '@types/node'
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - ci

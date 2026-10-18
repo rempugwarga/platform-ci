@@ -1,0 +1,11 @@
+# Ownership: Platform Engineering (@rempugwarga/platform-engineering)
+# Repo ini mendefinisikan standar CI/CD dan kontrol akses seluruh organisasi —
+# perubahan memerlukan review Platform Engineering.
+
+*                   @rempugwarga/platform-engineering @rempugwarga/identity-platform
+
+/repos.yaml         @rempugwarga/platform-engineering
+/repos.schema.json  @rempugwarga/platform-engineering
+/terraform/         @rempugwarga/platform-engineering
+/.github/           @rempugwarga/platform-engineering
+/docs/              @rempugwarga/platform-engineering

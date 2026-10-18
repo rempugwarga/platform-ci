@@ -1,0 +1,91 @@
+# Registry repository & kepemilikan rempugwarga.
+# Sumber kebenaran tunggal untuk: kepemilikan tim, pengaturan repo, dan branch
+# protection. Divalidasi oleh tests/registry-policy.test.ts dan diterapkan oleh
+# terraform/org (provider GitHub).
+#
+# `required_checks` berisi nama check GitHub Actions (nilai `name:` pada job)
+# yang WAJIB hijau sebelum merge. Nama harus sama persis dengan job pemanggil
+# (untuk workflow reusable, yang dihitung adalah job pemanggil, bukan job di
+# reusable workflow). Lihat docs/BRANCH-PROTECTION.md.
+
+organization: rempugwarga
+
+defaults:
+  visibility: private
+  require_code_owner_review: true
+
+teams:
+  - slug: platform-engineering
+    name: Platform Engineering
+    type: platform
+    description: "Platform team: CI/CD reusable, governance, docs portal, golden path aplikasi"
+  - slug: identity-platform
+    name: Identity Platform Team
+    type: platform
+    description: "Complicated-subsystem + platform: Keycloak, OIDC, kebijakan token"
+  - slug: design-system-team
+    name: Design System Team
+    type: platform
+    description: "Platform product: komponen UI, Storybook, rilis npm + MF remote"
+  - slug: team-billing
+    name: Tim Billing
+    type: stream-aligned
+    description: "Stream-aligned: domain billing"
+  - slug: team-web-dashboard
+    name: Tim Web Dashboard
+    type: stream-aligned
+    description: "Stream-aligned: dashboard operasional"
+
+repositories:
+  - name: design-system
+    description: "Design system React: paket npm @rempugwarga/design-system + Module Federation remote"
+    team: design-system-team
+    type: platform
+    criticality: high
+    ci: node
+    required_checks:
+      - "Changeset Required"
+      - "Build, Typecheck & Test"
+      - "Storybook Build"
+      - "Security Scan"
+      - "CodeQL (SAST)"
+  - name: identity-platform
+    description: "Konfigurasi Keycloak sebagai kode: realm, client, kebijakan token, integration test"
+    team: identity-platform
+    type: platform
+    criticality: critical
+    ci: terraform
+    required_checks:
+      - "Policy Tests (client & token)"
+      - "Terraform fmt/validate/tflint"
+      - "Security Scan (gitleaks + trivy)"
+      - "Realm Integration Test (ephemeral Keycloak)"
+  - name: platform-docs
+    description: "Portal dokumentasi & kontrak integrasi (OIDC, environment, design system)"
+    team: platform-engineering
+    type: platform
+    criticality: high
+    ci: node
+    required_checks:
+      - "Build & Test"
+      - "Security Scan"
+  - name: platform-ci
+    description: "Reusable workflows, standar CI/CD, dan settings-as-code organisasi"
+    team: platform-engineering
+    type: platform
+    criticality: critical
+    ci: node
+    required_checks:
+      - "Registry & ownership tests"
+      - "Lint workflow GitHub Actions"
+      - "Terraform (settings organisasi)"
+      - "Secret scanning"
+  - name: app-template
+    description: "Golden path: template aplikasi stream-aligned (OIDC + design system)"
+    team: platform-engineering
+    type: platform
+    criticality: medium
+    ci: node
+    required_checks:
+      - "Build & Test"
+      - "Security Scan"

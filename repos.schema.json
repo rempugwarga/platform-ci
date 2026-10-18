@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rempugwarga.example/schemas/repos.schema.json",
+  "title": "Registry repository rempugwarga",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["organization", "defaults", "teams", "repositories"],
+  "properties": {
+    "organization": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,38}$"
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visibility", "require_code_owner_review"],
+      "properties": {
+        "visibility": { "enum": ["private", "internal", "public"] },
+        "require_code_owner_review": { "type": "boolean" }
+      }
+    },
+    "teams": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slug", "name", "type", "description"],
+        "properties": {
+          "slug": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,49}$" },
+          "name": { "type": "string", "minLength": 3 },
+          "type": { "enum": ["platform", "stream-aligned", "enabling"] },
+          "description": { "type": "string", "minLength": 10 }
+        }
+      }
+    },
+    "repositories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "description",
+          "team",
+          "type",
+          "criticality",
+          "ci",
+          "required_checks"
+        ],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$" },
+          "description": { "type": "string", "minLength": 10, "maxLength": 240 },
+          "team": { "type": "string" },
+          "type": { "enum": ["platform", "stream-aligned", "enabling"] },
+          "criticality": { "enum": ["low", "medium", "high", "critical"] },
+          "ci": { "enum": ["node", "terraform", "none"] },
+          "required_checks": {
+            "description": "Nama check GitHub Actions (job `name:`) yang wajib hijau sebelum merge; minimal satu agar branch protection benar-benar menegakkan CI",
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 3, "pattern": "^[^\\s].*[^\\s]$" }
+          }
+        }
+      }
+    }
+  }
+}

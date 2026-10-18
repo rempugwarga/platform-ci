@@ -1,0 +1,74 @@
+name: Node CI (reusable)
+
+# Workflow reusable standar rempugwarga untuk repo Node/Bun.
+# Dipakai oleh: design-system (langsung), app-template, repo aplikasi lain.
+# Contoh pemakaian:
+#
+#   jobs:
+#     ci:
+#       uses: rempugwarga/platform-ci/.github/workflows/reusable-node-ci.yml@main
+#       with:
+#         working-directory: .
+#         artifact-path: dist
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Direktori kerja relatif terhadap root repo
+        type: string
+        default: "."
+      bun-version:
+        description: Versi Bun yang dipin
+        type: string
+        default: "1.4.2"
+      run-typecheck:
+        type: boolean
+        default: true
+      run-test:
+        type: boolean
+        default: true
+      run-build:
+        type: boolean
+        default: true
+      artifact-path:
+        description: Path artefak build untuk diunggah (kosongkan bila tidak perlu)
+        type: string
+        default: ""
+      artifact-name:
+        type: string
+        default: build-output
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ inputs.bun-version }}
+      - name: Install (frozen lockfile)
+        run: bun install --frozen-lockfile
+      - name: Typecheck
+        if: inputs.run-typecheck
+        run: bun run typecheck
+      - name: Test
+        if: inputs.run-test
+        run: bun run test
+      - name: Build
+        if: inputs.run-build
+        run: bun run build
+      - name: Upload artefak
+        if: inputs.artifact-path != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/${{ inputs.artifact-path }}
+          retention-days: 7
