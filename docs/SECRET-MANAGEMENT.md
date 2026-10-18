@@ -11,7 +11,6 @@ hidup di secret manager dan disuntikkan saat runtime/deploy.
 | Token registry npm | **Tidak ada** — npm Trusted Publishing (OIDC) | design-system release |
 | Token Terraform GitHub org | GitHub Environment `org-admin` | platform-ci terraform apply |
 | `ORG_READ_TOKEN` (baca lintas repo, read-only) | GitHub secret organisasi | platform-ci workflow `org-consistency` |
-| Lisensi gitleaks (org) | GitHub secret organisasi | semua repo |
 | Rahasia aplikasi runtime | Secret manager aplikasi (Vault/cloud SM) | aplikasi masing-masing |
 
 ## Penegakan berlapis

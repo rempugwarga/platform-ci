@@ -57,9 +57,10 @@ jobs:
     with:
       run-iac-scan: true
       iac-directory: terraform
-    secrets:
-      GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 ```
+
+Secret scanning memakai binary gitleaks OSS (tanpa lisensi/secret tambahan);
+tidak ada `secrets:` yang perlu diteruskan.
 
 ## Menambah workflow reusable baru
 
