@@ -3,10 +3,12 @@
 # protection. Divalidasi oleh tests/registry-policy.test.ts dan diterapkan oleh
 # terraform/org (provider GitHub).
 #
-# `required_checks` berisi nama check GitHub Actions (nilai `name:` pada job)
-# yang WAJIB hijau sebelum merge. Nama harus sama persis dengan job pemanggil
-# (untuk workflow reusable, yang dihitung adalah job pemanggil, bukan job di
-# reusable workflow). Lihat docs/BRANCH-PROTECTION.md.
+# `required_checks` berisi nama check GitHub Actions yang WAJIB hijau sebelum
+# merge, ditulis sama persis dengan yang dilaporkan GitHub:
+# - job biasa: nilai `name:` pada job;
+# - pemanggil workflow reusable: `<job pemanggil> / <job di reusable workflow>`
+#   (setiap job di reusable workflow melaporkan check-nya sendiri).
+# Lihat docs/BRANCH-PROTECTION.md.
 
 organization: rempugwarga
 
@@ -69,8 +71,10 @@ repositories:
     criticality: high
     ci: node
     required_checks:
-      - "Build & Test"
-      - "Security Scan"
+      - "Build & Test / CI"
+      - "Security Scan / Dependency audit"
+      - "Security Scan / IaC misconfiguration scan"
+      - "Security Scan / Secret scanning"
   - name: platform-ci
     description: "Reusable workflows, standar CI/CD, dan settings-as-code organisasi"
     team: platform-engineering
@@ -89,5 +93,7 @@ repositories:
     criticality: medium
     ci: node
     required_checks:
-      - "Build & Test"
-      - "Security Scan"
+      - "Build & Test / CI"
+      - "Security Scan / Dependency audit"
+      - "Security Scan / IaC misconfiguration scan"
+      - "Security Scan / Secret scanning"
