@@ -34,7 +34,7 @@ jobs:
       - name: Init + validate via script
         if: inputs.validate-script != ''
         run: bash ${{ inputs.validate-script }}
-      - uses: terraform-linters/setup-tflint@v4
+      - uses: terraform-linters/setup-tflint@v6
         if: inputs.run-tflint
         with:
           tflint_version: latest
