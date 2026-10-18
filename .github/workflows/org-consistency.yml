@@ -33,25 +33,25 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           path: .org/platform-ci
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           repository: rempugwarga/design-system
           token: ${{ secrets.ORG_READ_TOKEN }}
           path: .org/design-system
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           repository: rempugwarga/identity-platform
           token: ${{ secrets.ORG_READ_TOKEN }}
           path: .org/identity-platform
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           repository: rempugwarga/platform-docs
           token: ${{ secrets.ORG_READ_TOKEN }}
           path: .org/platform-docs
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           repository: rempugwarga/app-template
           token: ${{ secrets.ORG_READ_TOKEN }}
