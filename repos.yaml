@@ -11,7 +11,9 @@
 organization: rempugwarga
 
 defaults:
-  visibility: private
+  # Publik: syarat proteksi branch & GitHub Pages pada paket Free, dan agar
+  # kontrak/ADR dapat ditinjau siapa pun tanpa akses khusus.
+  visibility: public
   require_code_owner_review: true
 
 teams:

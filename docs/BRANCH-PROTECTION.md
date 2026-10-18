@@ -59,6 +59,22 @@ Dijalankan mingguan oleh workflow `org-consistency.yml` (butuh secret
 `ORG_READ_TOKEN`, lihat [SECRET-MANAGEMENT.md](SECRET-MANAGEMENT.md)) dan bisa
 dijalankan lokal dari root workspace polyrepo.
 
+## Status penerapan (bootstrap 2026-10-18)
+
+Repo dibuat publik via `gh` CLI dan ruleset `protect-default-branch` diterapkan
+lewat `gh api` (terraform belum tersedia di lingkungan lokal saat bootstrap).
+Dua penyesuaian sementara terhadap desain di atas:
+
+- `require_code_owner_review` ditahan `false` sampai tim GitHub dibuat —
+  CODEOWNERS yang menunjuk tim belum ada akan memblokir semua merge;
+- aktor bypass `repository_role: admin` (mode pull request) ditambahkan agar
+  organisasi solo tidak terkunci; hapus bypass begitu tim berisi ≥2 reviewer.
+
+Saat terraform tersedia: impor repo & ruleset (lihat bagian bawah), buat tim
+via provider (butuh token ber-scope `admin:org`), lalu `terraform apply` —
+terapkan hanya setelah tim dibuat agar code owner review bisa diaktifkan tanpa
+memblokir merge.
+
 ## Mengimpor repo/tim yang sudah ada
 
 ```sh
