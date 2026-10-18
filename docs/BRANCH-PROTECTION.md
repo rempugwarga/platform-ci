@@ -20,25 +20,30 @@ build/test, keamanan, dan (untuk `identity-platform`) integrasi realm. Repo
 `high`/`critical` **wajib** memuat minimal satu check keamanan — ditegakkan
 `tests/registry-policy.test.ts`.
 
-## `required_checks` adalah kontrak nama job
+## `required_checks` adalah kontrak nama check
 
-Nilai di `required_checks` harus **sama persis** dengan `name:` job di workflow
-repo tersebut. Untuk pemanggil workflow reusable, GitHub melaporkan nama job
-**pemanggil** (bukan job di dalam reusable workflow).
+Nilai di `required_checks` harus **sama persis** dengan nama check yang
+dilaporkan GitHub Actions:
+
+- job biasa → nilai `name:` pada job;
+- job yang memanggil workflow reusable → `<job pemanggil> / <job di reusable
+  workflow>`. Setiap job di reusable workflow melaporkan check-nya sendiri;
+  job pemanggil tidak melaporkan check agregat.
 
 Bila menambah/mengganti job di repo:
 
 1. Buka PR dan biarkan CI berjalan sekali.
-2. Catat nama check yang muncul (contoh: `Build & Test`).
+2. Catat nama check di tab **Checks** (contoh pemanggil reusable:
+   `Build & Test / CI`).
 3. Perbarui `required_checks` repo terkait di `repos.yaml`:
 
    ```yaml
-   - name: design-system
+   - name: platform-docs
      required_checks:
-       - "Build, Typecheck & Test"
-       - "Storybook Build"
-       - "Security Scan"
-       - "CodeQL (SAST)"
+       - "Build & Test / CI"
+       - "Security Scan / Dependency audit"
+       - "Security Scan / IaC misconfiguration scan"
+       - "Security Scan / Secret scanning"
    ```
 
 4. PR ke platform-ci → review Platform Engineering → `terraform apply`.
