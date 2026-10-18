@@ -32,7 +32,7 @@ jobs:
     if: inputs.run-gitleaks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Secret scanning (gitleaks OSS)
@@ -50,7 +50,7 @@ jobs:
       run:
         working-directory: ${{ inputs.working-directory }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2
@@ -65,7 +65,7 @@ jobs:
     if: inputs.run-iac-scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Trivy config scan
         run: |
           docker run --rm -v "$PWD":/src aquasec/trivy:latest \
